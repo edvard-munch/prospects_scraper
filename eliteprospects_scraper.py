@@ -2,7 +2,7 @@ import bs4
 import requests
 import subprocess
 import sys
-import re
+import regex
 
 
 READ_MESSAGE = '{} read from input'
@@ -73,5 +73,7 @@ def start_scraping():
     open_file(LINKS_FILE)
 
 
+    res = scrape_from_page(hfboards_soup, 'a', 'class', 'link link--external',
+                           string=regex.compile(fr'(?b)(?:{full_name}){{e<=2}}'))
 if __name__ == '__main__':
     start_scraping()
