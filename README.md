@@ -2,11 +2,11 @@ Scrapes and formats links to prospects pages on eliteprospects and hfboards. Mos
 Requests to eliteprospects unfortunately is very slow, and there is no way around it, as far as I know.
 
 Example input:
-095 Emil Andrae
-096 Fedor Svechkov
-097 Tristan Robins
-098 Filip Bystedt
-099 Jimmy Snuggerud
+095 Emil Andrae 
+096 Fedor Svechkov 
+097 Tristan Robins 
+098 Filip Bystedt 
+099 Jimmy Snuggerud 
 100 Oskar Olausson
 
 Example output:
