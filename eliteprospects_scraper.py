@@ -11,6 +11,9 @@ NAME_CLASS = 'name'
 PARSER = 'html.parser'
 SEARCH_URL = 'https://www.eliteprospects.com/search/player?q='
 PROSPECTS_MEGATHREAD = 'https://forums.hfboards.com/threads/prospect-megathread.2764521/'
+
+FULL_NAME_REGEX = r'(?b)(?:{}){{e<=2}}'
+
 PROSPECTS_FILE = 'prospects.txt'
 LINKS_FILE = 'links.txt'
 LINK_FORMAT = '{} {} {}'
@@ -82,7 +85,7 @@ def get_hf_link(var, megathread):
     full_name = f'{var[1]} {var[2]}'
 
     res = scrape_from_page(hfboards_soup, 'a', 'class', 'link link--external',
-                           string=regex.compile(fr'(?b)(?:{full_name}){{e<=2}}'))
+                           string=regex.compile(FULL_NAME_REGEX.format(full_name)))
 
     if res:
         hf_url = res[0].attrs['href']
