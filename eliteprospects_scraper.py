@@ -1,9 +1,9 @@
 import bs4
 import enchant
+import regex
 import requests
 import subprocess
 import sys
-import regex
 
 
 READ_MESSAGE = '{} read from input'
