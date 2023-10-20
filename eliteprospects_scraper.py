@@ -1,4 +1,5 @@
 import bs4
+import enchant
 import requests
 import subprocess
 import sys
@@ -9,7 +10,12 @@ READ_MESSAGE = '{} read from input'
 WRITTEN_MESSAGE = '{} written to output'
 NAME_CLASS = 'name'
 PARSER = 'html.parser'
+
+PROPER_NAMES_FILE = 'names'
 SEARCH_URL = 'https://www.eliteprospects.com/search/player?q='
+EP_AUTOCOMPLETE_URL = 'https://autocomplete.eliteprospects.com/all?q={}&hideNotActiveLeagues=1'
+EB_BASE_PLAYER_LINK = 'https://www.eliteprospects.com/player/{}/{}'
+
 PROSPECTS_MEGATHREAD = 'https://forums.hfboards.com/threads/prospect-megathread.2764521/'
 
 FULL_NAME_REGEX = r'(?b)(?:{}){{e<=2}}'
@@ -46,6 +52,7 @@ def scrape_from_page(soup, element_type, attr_type, attr_name, string=None):
 
 
 def start_scraping():
+    names_dictionary = enchant.request_pwl_dict('names.txt')
     links = []
     hfboards_response = requests.get(PROSPECTS_MEGATHREAD)
 
@@ -58,7 +65,7 @@ def start_scraping():
             print(READ_MESSAGE.format(line.strip()))
             var = line.split()
             hf_link = get_hf_link(var, hfboards_response)
-            ep_link = get_ep_link(var)
+            ep_link = get_ep_link(var, names_dictionary)
 
             link = LINK_FORMAT.format(line.strip(), ep_link, hf_link)
             links.append(LINK_FORMAT.format(line.strip(), format_link(ep_link, 'EP'),
@@ -96,18 +103,19 @@ def get_hf_link(var, megathread):
     return hf_url
 
 
-def get_ep_link(var):
-    query = f'{var[1]}+{var[2]}'
-    response = requests.get(SEARCH_URL + query)
-    soup = bs4.BeautifulSoup(response.content, PARSER)
+def get_ep_link(var, names_dictionary):
+    query = f'{var[1]} {var[2]}'
+    response = requests.get(EP_AUTOCOMPLETE_URL.format(query))
+    data = response.json()
 
-    try:
-        name_cell = scrape_from_page(soup, 'td', 'class', NAME_CLASS)[0]
-    except IndexError:
-        print('!!!!!!!!!! LINK NOT FOUND !!!!!!!!!')
+    if data:
+        url = EB_BASE_PLAYER_LINK.format(data[0]['id'], data[0]['slug'])
+        fullname = data[0]['fullname']
+        if not names_dictionary.is_added(fullname):
+            names_dictionary.add(fullname)
+    else:
+        print('!!!! ----Check for typos---- !!!!')
         return
-
-    url = name_cell.find('a').attrs['href']
 
     return url
 
