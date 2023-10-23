@@ -16,21 +16,19 @@ RESOURCES = [
     'HFBOARDS'
 ]
 
-PROPER_NAMES_FILE = 'names'
-SEARCH_URL = 'https://www.eliteprospects.com/search/player?q='
 EP_AUTOCOMPLETE_URL = 'https://autocomplete.eliteprospects.com/all?q={}&hideNotActiveLeagues=1'
 EB_BASE_PLAYER_LINK = 'https://www.eliteprospects.com/player/{}/{}'
-
 PROSPECTS_MEGATHREAD = 'https://forums.hfboards.com/threads/prospect-megathread.2764521/'
 
 REGEX_ERRORS_LIMIT = 2 # with 3 it gives wrong results too often
+NAME_REGEX = r'\w* \w*'
 FULL_NAME_REGEX = r'(?b)(?:{}){{e<={}}}'
 
 PROSPECTS_FILE = 'prospects.txt'
+PROPER_NAMES_FILE = 'names'
 LINKS_FILE = 'links.txt'
 
 NOT_FOUND_MESSAGE = "{} LINK for {} NOT FOUND. Check that player's name is without typos !!!"
-LINK_FORMAT = '{} {} {}'
 
 PLATFORMS = {
     'Windows': 'win32',
@@ -67,17 +65,18 @@ def start_scraping():
     with open(PROSPECTS_FILE) as f:
         for index, line in enumerate(f.readlines()):
 
-            if not line.strip():
+            line = line.strip()
+            if not line:
                 continue
 
-            print(READ_MESSAGE.format(line.strip()))
-            var = line.split()
-            hf_link = get_hf_link(var, hfboards_response)
-            ep_link = get_ep_link(var, names_dictionary)
+            print(READ_MESSAGE.format(line))
+            query_name = regex.search(NAME_REGEX, line)[0]
 
-            link = LINK_FORMAT.format(line.strip(), ep_link, hf_link)
-            links.append(LINK_FORMAT.format(line.strip(), format_link(ep_link, 'EP'),
-                                            format_link(hf_link, 'HF')))
+            hf_link = get_hf_link(query_name, hfboards_response)
+            ep_link = get_ep_link(query_name, names_dictionary)
+
+            link = f"{line}, {format_link(ep_link, 'EP')}, {format_link(hf_link, 'HF')}"
+            links.append(link)
 
     with open(LINKS_FILE, 'w') as f:
         for index, link in enumerate(links):
