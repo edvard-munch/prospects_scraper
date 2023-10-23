@@ -23,7 +23,8 @@ EB_BASE_PLAYER_LINK = 'https://www.eliteprospects.com/player/{}/{}'
 
 PROSPECTS_MEGATHREAD = 'https://forums.hfboards.com/threads/prospect-megathread.2764521/'
 
-FULL_NAME_REGEX = r'(?b)(?:{}){{e<=2}}'
+REGEX_ERRORS_LIMIT = 2 # with 3 it gives wrong results too often
+FULL_NAME_REGEX = r'(?b)(?:{}){{e<={}}}'
 
 PROSPECTS_FILE = 'prospects.txt'
 LINKS_FILE = 'links.txt'
@@ -93,13 +94,10 @@ def format_link(link, text):
         return text
 
 
-def get_hf_link(var, megathread):
+def get_hf_link(query_name, megathread):
     hfboards_soup = bs4.BeautifulSoup(megathread.content, PARSER)
-
-    full_name = f'{var[1]} {var[2]}'
-
     res = scrape_from_page(hfboards_soup, 'a', 'class', 'link link--external',
-                           string=regex.compile(FULL_NAME_REGEX.format(full_name)))
+                           string=regex.compile(FULL_NAME_REGEX.format(query_name, REGEX_ERRORS_LIMIT)))
 
     if res:
         hf_url = res[0].attrs['href']
