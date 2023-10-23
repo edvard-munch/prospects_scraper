@@ -103,21 +103,36 @@ def get_hf_link(var, megathread):
     return hf_url
 
 
-def get_ep_link(var, names_dictionary):
-    query = f'{var[1]} {var[2]}'
-    response = requests.get(EP_AUTOCOMPLETE_URL.format(query))
-    data = response.json()
+def get_ep_link(query_name, names_dictionary):
+    data = request_player_EP(query_name)
 
     if data:
-        url = EB_BASE_PLAYER_LINK.format(data[0]['id'], data[0]['slug'])
-        fullname = data[0]['fullname']
-        if not names_dictionary.is_added(fullname):
-            names_dictionary.add(fullname)
+        id_, slug, fullname = data[0]['id'], data[0]['slug'], data[0]['fullname']
+
     else:
-        print('!!!! ----Check for typos---- !!!!')
-        return
+        suggestions = names_dictionary.suggest(query_name)
+        if suggestions:
+            data = request_player_EP(suggestions[0])
+            if data:
+                id_, slug, fullname = data[0]['id'], data[0]['slug'], data[0]['fullname']
+            else:
+                print(NOT_FOUND_MESSAGE.format(RESOURCES[0], query_name))
+                return
+        else:
+            print(NOT_FOUND_MESSAGE.format(RESOURCES[0], query_name))
+            return
+
+    url = EB_BASE_PLAYER_LINK.format(id_, slug)
+
+    if not names_dictionary.is_added(fullname):
+        names_dictionary.add(fullname)
 
     return url
+
+
+def request_player_EP(query_name):
+    response = requests.get(EP_AUTOCOMPLETE_URL.format(query_name))
+    return response.json()
 
 
 if __name__ == '__main__':
