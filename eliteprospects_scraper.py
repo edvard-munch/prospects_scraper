@@ -11,6 +11,11 @@ WRITTEN_MESSAGE = '{} written to output'
 NAME_CLASS = 'name'
 PARSER = 'html.parser'
 
+RESOURCES = [
+    'ELITEPROSPECTS',
+    'HFBOARDS'
+]
+
 PROPER_NAMES_FILE = 'names'
 SEARCH_URL = 'https://www.eliteprospects.com/search/player?q='
 EP_AUTOCOMPLETE_URL = 'https://autocomplete.eliteprospects.com/all?q={}&hideNotActiveLeagues=1'
@@ -22,6 +27,8 @@ FULL_NAME_REGEX = r'(?b)(?:{}){{e<=2}}'
 
 PROSPECTS_FILE = 'prospects.txt'
 LINKS_FILE = 'links.txt'
+
+NOT_FOUND_MESSAGE = "{} LINK for {} NOT FOUND. Check that player's name is without typos !!!"
 LINK_FORMAT = '{} {} {}'
 
 PLATFORMS = {
@@ -98,7 +105,7 @@ def get_hf_link(var, megathread):
         hf_url = res[0].attrs['href']
     else:
         hf_url = None
-        print(f"HF BOARDS LINK for {full_name} NOT FOUND. Check that player's name is without typos !!!")
+        print(NOT_FOUND_MESSAGE.format(RESOURCES[1], query_name))
 
     return hf_url
 
