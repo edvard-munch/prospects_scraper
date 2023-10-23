@@ -59,7 +59,7 @@ def scrape_from_page(soup, element_type, attr_type, attr_name, string=None):
 
 
 def start_scraping():
-    names_dictionary = enchant.request_pwl_dict('names.txt')
+    names_dictionary = enchant.pypwl.PyPWL('names.txt')
     links = []
     hfboards_response = requests.get(PROSPECTS_MEGATHREAD)
 
